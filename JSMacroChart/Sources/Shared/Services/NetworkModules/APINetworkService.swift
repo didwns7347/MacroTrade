@@ -8,9 +8,11 @@
 import Foundation
 
 public final class APINetworkService: NetworkService {
+    public static let shared = APINetworkService()
+    private init(){}
+    
     public func request<T>(endpoint: any EndPoint) async throws -> T where T : Decodable {
         let urlRequest = try buildURLRequest(for: endpoint)
-        
         let (data, response) = try await URLSession.shared.data(for: urlRequest)
         
         guard let httpResponse = response as? HTTPURLResponse else {
@@ -18,6 +20,8 @@ public final class APINetworkService: NetworkService {
         }
         
         guard (200...299).contains(httpResponse.statusCode) else {
+            let responseString = String(data: data, encoding: .utf8) ?? "(data is not valid utf8)"
+            NSLog("[HTTP Error] StatusCode: \(httpResponse.statusCode)\nRaw Response: \(responseString)")
             throw NetworkError.statusCodeFail(httpResponse.statusCode)
         }
         
@@ -25,6 +29,8 @@ public final class APINetworkService: NetworkService {
             NSLog("[response Body]\(endpoint.path)\n \(data.prettyJsonString)")
             return try JSONDecoder().decode(T.self, from: data)
         } catch {
+            let responseString = String(data: data, encoding: .utf8) ?? "(data is not valid utf8)"
+            NSLog("[Decoding Error] Type: \(T.self)\nError: \(error)\nRaw Response: \(responseString)")
             throw NetworkError.decodingError(error)
         }
     }
@@ -41,9 +47,10 @@ extension APINetworkService {
         urlComponents?.queryItems = endPoint.parameters?.map{
             URLQueryItem(name: $0.key, value: "\($0.value)")
         }
+        
         // url 검사
         guard let url = urlComponents?.url else { throw NetworkError.invalidURL }
-        
+        print("requset URL : \(url)")
         var requset = URLRequest(url: url)
         
         requset.httpMethod = endPoint.method.rawValue

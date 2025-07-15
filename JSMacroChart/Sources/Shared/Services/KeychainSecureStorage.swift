@@ -26,7 +26,7 @@ final class KeychainSecureStorage: SecureStorageProtocol {
     func read(service: String, account: String) -> Data? {
         let query = [
             kSecClass: kSecClassGenericPassword,
-            kSecAttrServer: service,
+            kSecAttrService: service,
             kSecAttrAccount: account,
             kSecMatchLimit: kSecMatchLimitOne,
             kSecReturnData: true

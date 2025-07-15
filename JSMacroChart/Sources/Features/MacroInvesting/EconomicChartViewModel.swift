@@ -54,6 +54,7 @@ class EconomicChartViewModel: ObservableObject {
                 ]
 
             } catch {
+                await apiService.resetToken()
                 errorMessage = "데이터를 불러오는데 실패했습니다: \(error.localizedDescription)"
                 print(error)
             }
@@ -62,11 +63,11 @@ class EconomicChartViewModel: ObservableObject {
     }
 
     private func fetchAndProcessData(symbol: String) async throws -> [ChartDataPoint] {
-        let dailyPrices = try await apiService.fetchDailyPrice(symbol: symbol)
+        let dailyPrices = try await apiService.fetchDailyPrice(stockCode: symbol)
         
         let chartData = dailyPrices.compactMap { data -> ChartDataPoint? in
-            guard let date = dateFormatter.date(from: data.date),
-                  let value = Double(data.close) else {
+            guard let date = dateFormatter.date(from: data.businessDate),
+                  let value = Double(data.closingPrice) else {
                 return nil
             }
             return ChartDataPoint(date: date, value: value)

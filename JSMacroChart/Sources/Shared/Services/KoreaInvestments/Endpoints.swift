@@ -9,8 +9,16 @@ import Foundation
 // MARK: - Korea Investment Endpoint
 enum KoreaInvestmentEndpoint {
     case issueToken
-    case fetchDailyPrice(token: String, symbol: String, period: String)
+    case fetchDailyPrice(
+        token: String,
+        stockCode: String,
+        periodDivCode: String,
+        startDate: String,
+        finDate: String
+    )
 }
+
+
 
 extension KoreaInvestmentEndpoint: EndPoint {
     var baseURL: URL {
@@ -22,7 +30,7 @@ extension KoreaInvestmentEndpoint: EndPoint {
         case .issueToken:
             return "/oauth2/tokenP"
         case .fetchDailyPrice:
-            return "/uapi/domestic-stock/v1/quotations/inquire-daily-price"
+            return "/uapi/domestic-stock/v1/quotations/inquire-daily-itemchartprice"
         }
     }
 
@@ -39,12 +47,14 @@ extension KoreaInvestmentEndpoint: EndPoint {
         switch self {
         case .issueToken:
             return nil
-        case .fetchDailyPrice(_, let symbol, let period):
+        case .fetchDailyPrice(_, let stockCode, let period, let startDate, let finDate ):
             return [
-                "FID_COND_MRKT_DIV_CODE": "J",
-                "FID_INPUT_ISCD": symbol,
-                "FID_PERIOD_DIV_CODE": period,
-                "FID_ORG_ADJ_PRC": "1"
+                "fid_cond_mrkt_div_code": "J",
+                "fid_input_iscd": stockCode,
+                "fid_input_date_1": startDate,
+                "fid_input_date_2": finDate,
+                "fid_period_div_code": period,
+                "fid_org_adj_prc":"1"
             ]
         }
     }
@@ -53,13 +63,14 @@ extension KoreaInvestmentEndpoint: EndPoint {
         switch self {
         case .issueToken:
             return ["content-type": "application/json"]
-        case .fetchDailyPrice(let token, _, _):
+        case .fetchDailyPrice(let token, _, _, _, _):
             return [
-                "content-type": "application/json; charset=utf-8",
-                "authorization": "Bearer \(token)",
+                "content-type": "application/json",
+                "Connection" : "keep-alive",
+                "Authorization": "Bearer \(token)",
                 "appkey": APIKeyManager.shared.appKey,
                 "appsecret": APIKeyManager.shared.appSecret,
-                "tr_id": "FHKST01010400"
+                "tr_id": "FHKST03010100"
             ]
         }
     }
@@ -67,11 +78,11 @@ extension KoreaInvestmentEndpoint: EndPoint {
     var requestBody: Encodable? {
         switch self {
         case .issueToken:
-            return IssueTokenRequestBody(
-                grantType: "client_credentials",
-                appkey: APIKeyManager.shared.appKey,
-                appsecret: APIKeyManager.shared.appSecret
-            )
+            return [
+                "grant_type": "client_credentials",
+                "appkey": APIKeyManager.shared.appKey,
+                "appsecret": APIKeyManager.shared.appSecret
+            ]
         case .fetchDailyPrice:
             return nil
         }
