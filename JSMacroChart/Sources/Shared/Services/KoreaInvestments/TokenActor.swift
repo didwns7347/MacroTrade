@@ -46,6 +46,7 @@ actor TokenManager {
     func getValidToken() async throws -> String {
         let now = Date()
         if let token = token, let expires = expiresAt, expires > now {
+            print("token=",token)
             return token
         }
         // 이미 발급 중이면 기존 Task를 기다림
@@ -58,10 +59,9 @@ actor TokenManager {
             let response: TokenResponse = try await networkService.request(endpoint: endpoint)
             let newToken = response.accessToken
             let newExpiresAt = response.tokenExpiredAt.convertToDate()
-            // Keychain 저장
-            let tokenData = try JSONEncoder().encode(newToken)
+
             let expiresAtData = try JSONEncoder().encode(newExpiresAt)
-            secureStorage.save(tokenData, service: KeychainKey.service, account: KeychainKey.accessToken)
+            secureStorage.save(newToken.data(using: .utf8) ?? Data(), service: KeychainKey.service, account: KeychainKey.accessToken)
             secureStorage.save(expiresAtData, service: KeychainKey.service, account: KeychainKey.tokenExpiresAt)
             // actor 상태 갱신
             self.token = newToken

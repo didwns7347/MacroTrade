@@ -39,18 +39,20 @@ class EconomicChartViewModel: ObservableObject {
         
         Task {
             do {
-                // KODEX 구리선물(138910)과 TIGER 미국S&P500(360750) 데이터를 가져옵니다.
+                // KODEX 구리선물(138910), TIGER 미국S&P500(360750), TIGER 미국필라델피아반도체(139320) 데이터를 가져옵니다.
                 async let copperData = fetchAndProcessData(symbol: "138910")
                 async let sp500Data = fetchAndProcessData(symbol: "360750")
+                async let semiData = fetchAndProcessData(symbol: "139320")
 
-                let (fetchedCopper, fetchedSP500) = try await (copperData, sp500Data)
+                let (fetchedCopper, fetchedSP500, fetchedSemi) = try await (copperData, sp500Data, semiData)
 
-                // 두 데이터를 Y축 스케일에 맞춰 조정합니다.
-                let (alignedCopper, alignedSP500) = alignAndScaleData(series1: fetchedCopper, series2: fetchedSP500)
+                // 세 데이터를 Y축 스케일에 맞춰 조정합니다.
+                let (alignedCopper, alignedSP500, alignedSemi) = alignAndScaleThreeSeries(series1: fetchedCopper, series2: fetchedSP500, series3: fetchedSemi)
 
                 self.chartSeries = [
                     ChartSeries(name: "KODEX 구리선물", items: alignedCopper),
-                    ChartSeries(name: "TIGER S&P500", items: alignedSP500)
+                    ChartSeries(name: "TIGER S&P500", items: alignedSP500),
+                    ChartSeries(name: "TIGER 필라델피아반도체", items: alignedSemi)
                 ]
 
             } catch {
@@ -77,26 +79,33 @@ class EconomicChartViewModel: ObservableObject {
         return Array(chartData.suffix(dataPointLimit))
     }
 
-    /// 두 데이터 시리즈의 스케일을 맞추고 날짜를 정렬합니다.
-    private func alignAndScaleData(series1: [ChartDataPoint], series2: [ChartDataPoint]) -> ([ChartDataPoint], [ChartDataPoint]) {
-        guard let firstValue1 = series1.first?.value, let firstValue2 = series2.first?.value, firstValue1 != 0, firstValue2 != 0 else {
-            return (series1, series2) // 데이터가 없으면 원본 반환
+    /// 세 데이터 시리즈의 스케일을 맞추고 날짜를 정렬합니다.
+    private func alignAndScaleThreeSeries(series1: [ChartDataPoint], series2: [ChartDataPoint], series3: [ChartDataPoint]) -> ([ChartDataPoint], [ChartDataPoint], [ChartDataPoint]) {
+        guard let firstValue1 = series1.first?.value,
+              let firstValue2 = series2.first?.value,
+              let firstValue3 = series3.first?.value,
+              firstValue1 != 0, firstValue2 != 0, firstValue3 != 0 else {
+            return (series1, series2, series3) // 데이터가 없으면 원본 반환
         }
 
-        // series2의 첫번째 값을 series1의 첫번째 값에 맞추기 위한 비율 계산
-        let scaleFactor = firstValue1 / firstValue2
+        // series2, series3의 첫번째 값을 series1의 첫번째 값에 맞추기 위한 비율 계산
+        let scaleFactor2 = firstValue1 / firstValue2
+        let scaleFactor3 = firstValue1 / firstValue3
 
-        let scaledSeries2 = series2.map { ChartDataPoint(date: $0.date, value: $0.value * scaleFactor) }
+        let scaledSeries2 = series2.map { ChartDataPoint(date: $0.date, value: $0.value * scaleFactor2) }
+        let scaledSeries3 = series3.map { ChartDataPoint(date: $0.date, value: $0.value * scaleFactor3) }
         
         // 날짜를 기준으로 데이터 정렬
         let dict1 = Dictionary(uniqueKeysWithValues: series1.map { ($0.date, $0.value) })
         let dict2 = Dictionary(uniqueKeysWithValues: scaledSeries2.map { ($0.date, $0.value) })
+        let dict3 = Dictionary(uniqueKeysWithValues: scaledSeries3.map { ($0.date, $0.value) })
 
-        let commonDates = Set(dict1.keys).intersection(Set(dict2.keys)).sorted()
+        let commonDates = Set(dict1.keys).intersection(Set(dict2.keys)).intersection(Set(dict3.keys)).sorted()
 
         let aligned1 = commonDates.map { ChartDataPoint(date: $0, value: dict1[$0]!) }
         let aligned2 = commonDates.map { ChartDataPoint(date: $0, value: dict2[$0]!) }
+        let aligned3 = commonDates.map { ChartDataPoint(date: $0, value: dict3[$0]!) }
 
-        return (aligned1, aligned2)
+        return (aligned1, aligned2, aligned3)
     }
 }

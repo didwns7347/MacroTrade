@@ -16,6 +16,7 @@ struct ContentView: View {
             .navigationTitle("경제 지표")
             .onAppear {
                 viewModel.fetchData()
+
             }
         }
     }
