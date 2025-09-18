@@ -16,13 +16,13 @@ actor TokenManager {
     private var token: String?
     private var expiresAt: Date?
     private let networkService: NetworkService
-    private let apiKeyManager: APIKeyManager
+    private let apiKeyManager: APIConfigManager
     private let secureStorage: SecureStorageProtocol
     private var refreshingTask: Task<String, Error>? = nil
 
     init(
         networkService: NetworkService = APINetworkService.shared,
-        apiKeyManager: APIKeyManager = .shared,
+        apiKeyManager: APIConfigManager = .shared,
         secureStorage: SecureStorageProtocol = KeychainSecureStorage.shared
     ) {
         self.networkService = networkService
@@ -46,7 +46,7 @@ actor TokenManager {
     func getValidToken() async throws -> String {
         let now = Date()
         if let token = token, let expires = expiresAt, expires > now {
-            print("token=",token)
+//            print("token=",token)
             return token
         }
         // 이미 발급 중이면 기존 Task를 기다림

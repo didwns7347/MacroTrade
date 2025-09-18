@@ -131,3 +131,149 @@ struct TokenResponse: Decodable {
         case tokenExpiredAt = "access_token_token_expired"
     }
 }
+
+// MARK: - 국내주식 잔고조회 응답
+struct DomesticStockBalanceResponse: Decodable {
+    let stockList: [DomesticStockInfo]?  // ⭐ Optional - 에러시 nil
+    let accountSummary: [DomesticAccountSummaryResponse]?  // ⭐ Optional - 에러시 nil
+    let returnCode: String
+    let messageCode: String
+    let message: String
+
+    enum CodingKeys: String, CodingKey {
+        case stockList = "output1"
+        case accountSummary = "output2"
+        case returnCode = "rt_cd"
+        case messageCode = "msg_cd"
+        case message = "msg1"
+    }
+    
+    // 성공/실패 판별
+    var isSuccess: Bool {
+        returnCode == "0"
+    }
+    
+
+
+}
+
+// MARK: - 해외주식 잔고조회 응답
+struct OverseasStockBalanceResponse: Decodable {
+    let stockList: [OverseasStockInfo]?  // ⭐ Optional - 에러시 nil
+    let accountSummary: OverseasAccountSummaryResponse?  // ⭐ Optional - 에러시 nil
+    let returnCode: String
+    let messageCode: String
+    let message: String
+
+    enum CodingKeys: String, CodingKey {
+        case stockList = "output1"
+        case accountSummary = "output2"
+        case returnCode = "rt_cd"
+        case messageCode = "msg_cd"
+        case message = "msg1"
+    }
+    
+    // 성공/실패 판별
+    var isSuccess: Bool {
+        returnCode == "0"
+    }
+    
+    // 안전한 데이터 접근
+    var safeStockList: [OverseasStockInfo] {
+        stockList ?? []
+    }
+
+}
+
+
+struct OverseasStockInfo : Codable {
+    let ticker: String // 주식 티커
+    let name: String // 주식 명
+    let gainLoss: String // 손익 금액
+    let gainLossRate: String // 손익 비율
+    let currentPrice : String // 현재 주식 1개 가격
+    let avgBuyingPrice : String // 평균 매입 금액
+    let totalCurrentPrice: String // 해외주식 평가금 금액
+    let totalBuyingPrice: String // 해외주식 매입 금액
+    let quantity: String // 수량
+    let excgCd: String // 거래소 코드
+    
+    enum CodingKeys : String, CodingKey {
+        case ticker = "ovrs_pdno"
+        case name = "ovrs_item_name"
+        case gainLoss = "frcr_evlu_pfls_amt"
+        case gainLossRate = "evlu_pfls_rt"
+        case currentPrice = "now_pric2"
+        case avgBuyingPrice = "pchs_avg_pric"
+        case totalCurrentPrice = "frcr_pchs_amt1"
+        case totalBuyingPrice = "ovrs_stck_evlu_amt"
+        case quantity = "ovrs_cblc_qty"
+        case excgCd = "ovrs_excg_cd"
+    }
+    
+}
+struct DomesticStockInfo : Codable {
+    let code: String? // 주식 코드
+    let name: String // 주식 명
+    let gainLoss: String // 손익 금액
+    let gainLossRate: String // 손익 비율
+    let currentPrice : String // 현재 주식 1개 가격
+    let avgBuyingPrice : String // 평균 매입 금액
+    let totalCurrentPrice: String // 해외주식 평가금 금액
+    let totalBuyingPrice: String // 해외주식 매입 금액
+    let quantity: String // 수량
+//    let excgCd: String // 거래소 코드
+    
+    enum CodingKeys : String, CodingKey {
+        case code = "pdno"
+        case name = "prdt_name"
+        case gainLoss = "evlu_pfls_amt"
+        case gainLossRate = "evlu_pfls_rt"
+        case currentPrice = "prpr"
+        case avgBuyingPrice = "pchs_avg_pric"
+        case totalCurrentPrice = "evlu_amt"
+        case totalBuyingPrice = "pchs_amt"
+        case quantity = "hldg_qty"
+//        case excgCd = "ovrs_excg_cd"
+    }
+}
+
+struct DomesticAccountSummaryResponse : Codable {
+    let totalAmount: String
+    let totalGainLoss: String
+    let totalGainLossRate: String
+    enum CodingKeys : String, CodingKey {
+        case totalAmount = "dnca_tot_amt"
+        case totalGainLoss = "asst_icdc_amt"
+        case totalGainLossRate = "asst_icdc_erng_rt"
+    }
+}
+
+struct OverseasAccountSummaryResponse : Codable {
+    let totalAmount: String
+    let totalGainLoss: String
+    let totalGainLossRate: String
+    enum CodingKeys : String, CodingKey {
+        case totalAmount = "frcr_pchs_amt1"
+        case totalGainLoss = "ovrs_tot_pfls"
+        case totalGainLossRate = "tot_pftrt"
+    }
+}
+
+struct OverseasAccountInfo: Codable {
+    let balance: OverseasAccountBalance
+    enum CodingKeys : String, CodingKey {
+        case balance = "output"
+    }
+}
+struct OverseasAccountBalance: Codable {
+    let currencyCode : String
+    let amount : String
+    let exchangeRate : String
+    enum coddingKeys : String, CodingKey {
+        case currencyCode = "tr_crcy_cd"
+        case amount = "ord_psbl_frcr_amt"
+        case exchangeRate = "exrt"
+    }
+}
+

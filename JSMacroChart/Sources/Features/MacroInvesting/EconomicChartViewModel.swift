@@ -52,7 +52,7 @@ class EconomicChartViewModel: ObservableObject {
                 self.chartSeries = [
                     ChartSeries(name: "KODEX 구리선물", items: alignedCopper),
                     ChartSeries(name: "TIGER S&P500", items: alignedSP500),
-                    ChartSeries(name: "TIGER 필라델피아반도체", items: alignedSemi)
+                    ChartSeries(name: "TIGER 금/은 선물", items: alignedSemi)
                 ]
 
             } catch {

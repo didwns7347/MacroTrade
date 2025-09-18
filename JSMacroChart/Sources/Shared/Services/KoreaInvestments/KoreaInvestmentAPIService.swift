@@ -40,6 +40,53 @@ class KoreaInvestmentAPIService {
         return response.dailyPrices
     }
     
+    /// 국내주식 잔고를 조회합니다.
+    func fetchDomesticStockBalance() async throws -> DomesticStockBalanceResponse {
+        let token = try await tokenManager.getValidToken()
+        let endpoint = KoreaInvestmentEndpoint.fetchDomesticStockBalance(
+            token: token
+        )
+        let response: DomesticStockBalanceResponse = try await networkService.request(endpoint: endpoint)
+        
+        // API 에러 체크 (더 상세한 에러 처리)
+        guard response.isSuccess else {
+            let errorMessage = "[\(response.messageCode)] \(response.message)"
+            throw NSError(
+                domain: "KoreaInvestmentAPI", 
+                code: Int(response.returnCode) ?? -1, 
+                userInfo: [NSLocalizedDescriptionKey: errorMessage]
+            )
+        }
+        
+        return response
+    }
+    
+    /// 해외주식 잔고를 조회합니다.
+    func fetchOverseasStockBalance(
+        exchangeCode: String = "NASD", // 기본값: 나스닥
+        currencyCode: String = "USD"   // 기본값: 미국 달러
+    ) async throws -> OverseasStockBalanceResponse {
+        let token = try await tokenManager.getValidToken()
+        let endpoint = KoreaInvestmentEndpoint.fetchOverseasStockBalance(
+            token: token,
+            OVRS_EXCG_CD: exchangeCode,
+            TR_CRCY_CD: currencyCode
+        )
+        let response: OverseasStockBalanceResponse = try await networkService.request(endpoint: endpoint)
+        
+        // API 에러 체크 (더 상세한 에러 처리)
+        guard response.isSuccess else {
+            let errorMessage = "[\(response.messageCode)] \(response.message)"
+            throw NSError(
+                domain: "KoreaInvestmentAPI", 
+                code: Int(response.returnCode) ?? -1, 
+                userInfo: [NSLocalizedDescriptionKey: errorMessage]
+            )
+        }
+        
+        return response
+    }
+    
     private func getStartFinDates() -> (String, String) {
         return (
             Calendar.current.date(byAdding: .month, value: -2, to: Date())?.toStringYYYYMMDD() ?? "",
