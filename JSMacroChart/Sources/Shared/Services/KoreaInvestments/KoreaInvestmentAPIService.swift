@@ -87,6 +87,23 @@ class KoreaInvestmentAPIService {
         return response
     }
     
+    /// 해외주식 예수금 조회
+    func fetchOverseasAccountBalance() async throws -> OverseasAccountBalance {
+        let token = try await tokenManager.getValidToken()
+        let endpoint = KoreaInvestmentEndpoint.fetchOverseasAccountBalance(token: token, OVRS_EXCG_CD: "NASD")
+        let response: OverseasAccountInfo = try await networkService.request(endpoint: endpoint)
+        guard response.isSuccess else {
+            let errorMessage = "[\(response.messageCode)] \(response.message)"
+            throw NSError(
+                domain: "KoreaInvestmentAPI",
+                code: Int(response.returnCode) ?? -1,
+                userInfo: [NSLocalizedDescriptionKey: errorMessage]
+            )
+        }
+        return response.balance
+    }
+
+    
     private func getStartFinDates() -> (String, String) {
         return (
             Calendar.current.date(byAdding: .month, value: -2, to: Date())?.toStringYYYYMMDD() ?? "",

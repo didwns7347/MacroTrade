@@ -242,17 +242,19 @@ struct DomesticAccountSummaryResponse : Codable {
     let totalAmount: String
     let totalGainLoss: String
     let totalGainLossRate: String
+    let orderableCash: String
     enum CodingKeys : String, CodingKey {
-        case totalAmount = "dnca_tot_amt"
+        case totalAmount = "bfdy_tot_asst_evlu_amt"
         case totalGainLoss = "asst_icdc_amt"
         case totalGainLossRate = "asst_icdc_erng_rt"
+        case orderableCash = "dnca_tot_amt"
     }
 }
 
 struct OverseasAccountSummaryResponse : Codable {
-    let totalAmount: String
-    let totalGainLoss: String
-    let totalGainLossRate: String
+    let totalAmount: String // 총평가 금액
+    let totalGainLoss: String // 수익금
+    let totalGainLossRate: String // 수익률
     enum CodingKeys : String, CodingKey {
         case totalAmount = "frcr_pchs_amt1"
         case totalGainLoss = "ovrs_tot_pfls"
@@ -262,18 +264,50 @@ struct OverseasAccountSummaryResponse : Codable {
 
 struct OverseasAccountInfo: Codable {
     let balance: OverseasAccountBalance
+    
+    let returnCode: String
+    let messageCode: String
+    let message: String
     enum CodingKeys : String, CodingKey {
         case balance = "output"
+        case returnCode = "rt_cd"
+        case messageCode = "msg_cd"
+        case message = "msg1"
+    }
+    // 성공/실패 판별
+    var isSuccess: Bool {
+        returnCode == "0"
     }
 }
 struct OverseasAccountBalance: Codable {
     let currencyCode : String
-    let amount : String
+    let orderableCash : String
     let exchangeRate : String
-    enum coddingKeys : String, CodingKey {
+    
+    enum CodingKeys : String, CodingKey {
         case currencyCode = "tr_crcy_cd"
-        case amount = "ord_psbl_frcr_amt"
+        case orderableCash = "ord_psbl_frcr_amt"
         case exchangeRate = "exrt"
     }
 }
 
+struct DomesticAccountInfo: Codable {
+    let balance: DomesticAccountBalance
+    let returnCode: String
+    let messageCode: String
+    let message: String
+    enum CodingKeys : String, CodingKey {
+        case balance = "output"
+        case returnCode = "rt_cd"
+        case messageCode = "msg_cd"
+        case message = "msg1"
+    }
+    // 성공/실패 판별
+    var isSuccess: Bool {
+        returnCode == "0"
+    }
+}
+
+struct DomesticAccountBalance: Codable {
+    let cash: String
+}

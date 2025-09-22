@@ -8,7 +8,7 @@
 import Foundation
 
 // MARK: - UserAsset 타입 안전성 개선
-extension UserAsset {
+extension StockAsset {
     
     // MARK: - 안전한 숫자 변환 (String → Decimal/Double)
     var safeCurrentPrice: Decimal? {
@@ -116,8 +116,8 @@ private extension Decimal {
 }
 
 // MARK: - UserAsset Equatable 구현
-extension UserAsset: Equatable {
-    static func == (lhs: UserAsset, rhs: UserAsset) -> Bool {
+extension StockAsset: Equatable {
+    static func == (lhs: StockAsset, rhs: StockAsset) -> Bool {
         return lhs.identifier == rhs.identifier &&
                lhs.assetType == rhs.assetType &&
                lhs.name == rhs.name &&
@@ -127,7 +127,7 @@ extension UserAsset: Equatable {
 }
 
 // MARK: - UserAsset Hashable 구현 (ForEach에서 id로 사용 가능)
-extension UserAsset: Hashable {
+extension StockAsset: Hashable {
     func hash(into hasher: inout Hasher) {
         hasher.combine(identifier)
         hasher.combine(assetType)
@@ -136,13 +136,13 @@ extension UserAsset: Hashable {
 }
 
 // MARK: - 컬렉션 확장
-extension Array where Element == UserAsset {
+extension Array where Element == StockAsset {
     
-    var domesticAssets: [UserAsset] {
+    var domesticAssets: [StockAsset] {
         filter { $0.assetType == .domestic }
     }
     
-    var overseasAssets: [UserAsset] {
+    var overseasAssets: [StockAsset] {
         filter { $0.assetType == .overseas }
     }
     
@@ -163,11 +163,11 @@ extension Array where Element == UserAsset {
         return Double(truncating: (totalGain / totalCurrent * 100) as NSDecimalNumber)
     }
     
-    var validAssets: [UserAsset] {
+    var validAssets: [StockAsset] {
         filter { $0.isValid }
     }
     
-    func sortedByValue(ascending: Bool = false) -> [UserAsset] {
+    func sortedByValue(ascending: Bool = false) -> [StockAsset] {
         sorted { lhs, rhs in
             let lhsValue = lhs.safeTotalCurrentPrice ?? 0
             let rhsValue = rhs.safeTotalCurrentPrice ?? 0
@@ -175,7 +175,7 @@ extension Array where Element == UserAsset {
         }
     }
     
-    func sortedByGainLoss(ascending: Bool = false) -> [UserAsset] {
+    func sortedByGainLoss(ascending: Bool = false) -> [StockAsset] {
         sorted { lhs, rhs in
             let lhsGain = lhs.safeGainLoss ?? 0
             let rhsGain = rhs.safeGainLoss ?? 0

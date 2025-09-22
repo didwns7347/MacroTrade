@@ -8,7 +8,7 @@
 import Foundation
 
 protocol UserAssetRepository {
-    func getUserAssets() async -> [UserAsset]
+    func getUserAssets() async -> [StockAsset]
 }
 
 /*
@@ -25,7 +25,7 @@ struct KoreaInvestmentUserAssetRepository: UserAssetRepository {
         self.apiService = apiService
     }
     
-    func getUserAssets() async -> [UserAsset] {
+    func getUserAssets() async -> [StockAsset] {
         print("getUserAssets")
         do {
             // 동시에 국내/해외 주식 잔고 조회
@@ -39,11 +39,11 @@ struct KoreaInvestmentUserAssetRepository: UserAssetRepository {
             let domesticResult = try await domesticResponse
             let overseasResult = try await overseasResponse
             
-            var userAssets: [UserAsset] = []
+            var userAssets: [StockAsset] = []
             
             // 국내주식을 UserAsset으로 변환 (안전한 접근)
             for domesticStock in domesticResult.stockList ?? [] {
-                let userAsset = UserAsset(
+                let userAsset = StockAsset(
                     assetType: .domestic,
                     ticker: nil,
                     code: domesticStock.code,
@@ -62,7 +62,7 @@ struct KoreaInvestmentUserAssetRepository: UserAssetRepository {
             
             // 해외주식을 UserAsset으로 변환 (안전한 접근)
             for overseasStock in overseasResult.safeStockList {
-                let userAsset = UserAsset(
+                let userAsset = StockAsset(
                     assetType: .overseas,
                     ticker: overseasStock.ticker,
                     code: nil,

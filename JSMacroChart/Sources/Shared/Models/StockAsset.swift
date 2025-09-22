@@ -4,15 +4,15 @@
 //
 //  Created by yangjs on 9/16/25.
 //
+import Foundation
 
 
-
-enum AssetType {
-    case domestic // 국내주식
-    case overseas // 해외주식
+enum AssetType: String {
+    case domestic = "국내 주식"  // 국내주식
+    case overseas = "해외 주식" // 해외주식
 }
 
-struct UserAsset {
+struct StockAsset {
     var assetType: AssetType
     var ticker: String?
     var code: String?

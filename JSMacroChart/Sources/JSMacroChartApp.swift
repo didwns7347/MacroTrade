@@ -4,7 +4,7 @@ import SwiftUI
 struct JSMacroChartApp: App {
     var body: some Scene {
         WindowGroup {
-            AssetDashboard()
+            DashboardView()
         }
     }
 }
