@@ -205,8 +205,8 @@ struct OverseasStockInfo : Codable {
         case gainLossRate = "evlu_pfls_rt"
         case currentPrice = "now_pric2"
         case avgBuyingPrice = "pchs_avg_pric"
-        case totalCurrentPrice = "frcr_pchs_amt1"
-        case totalBuyingPrice = "ovrs_stck_evlu_amt"
+        case totalCurrentPrice = "ovrs_stck_evlu_amt"
+        case totalBuyingPrice = "frcr_pchs_amt1"
         case quantity = "ovrs_cblc_qty"
         case excgCd = "ovrs_excg_cd"
     }

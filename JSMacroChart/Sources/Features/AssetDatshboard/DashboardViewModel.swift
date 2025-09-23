@@ -3,7 +3,9 @@ import Combine
 
 class DashboardViewModel: ObservableObject {
     @Published var stocks: [StockAsset] = []
-    func fetchStokcs() {
-        
+    func fetchStocks() {
+        Task { @MainActor in
+            stocks = await KoreaInvestmentUserAssetRepository().getUserAssets()
+        }
     }
 }

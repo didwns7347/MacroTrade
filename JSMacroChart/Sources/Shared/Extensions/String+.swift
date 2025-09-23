@@ -19,4 +19,12 @@ extension String {
         }
         return nil
     }
+    
+    func getFloatValue() -> Float? {
+        return Float(self)
+    }
+    
+    func getDecimalValue() -> Decimal? {
+        return Decimal(string: self)
+    }
 }
