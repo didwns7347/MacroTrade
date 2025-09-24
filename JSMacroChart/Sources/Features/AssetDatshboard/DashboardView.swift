@@ -19,29 +19,33 @@ struct AssetRow: Identifiable {
 
 // MARK: - MVI View
 struct DashboardView: View {
-    @StateObject var viewModel: DashboardViewModel = DashboardViewModel()
+    @EnvironmentObject var assetService: AssetService
 
     var body : some View {
         NavigationStack {
-            List {
-                Section {
-                    AccountCardView()
-                }
-                
-                Section(header: Text("보유 주식")) {
-                    ForEach(viewModel.stocks) { asset in
-                        StockRow(stock: asset)
+            ZStack(alignment: .bottomTrailing) {
+                List {
+                    Section {
+                        AccountCardView()
+                    }
+                    
+                    Section(header: Text("보유 주식")) {
+                        ForEach(assetService.stocks) { asset in
+                            StockRow(stock: asset)
+                        }
                     }
                 }
+                .listStyle(InsetGroupedListStyle())
+                .navigationTitle("나의 자산")
+                
+                NavigationLink(destination: AgentView()) {
+                    FloatingButton()
+                }
+                .padding()
             }
-            .listStyle(InsetGroupedListStyle())
-            //                .navigationTitle("나의 자산")
-            
-            
-            
         }
         .onAppear {
-            viewModel.fetchStocks()
+            assetService.fetchStocks()
         }
     }
 }

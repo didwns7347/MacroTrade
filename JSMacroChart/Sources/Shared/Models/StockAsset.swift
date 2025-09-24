@@ -7,7 +7,7 @@
 import Foundation
 
 
-enum AssetType: String {
+enum AssetType: String, Encodable,Decodable {
     case domestic = "국내 주식"  // 국내주식
     case overseas = "해외 주식" // 해외주식
 }

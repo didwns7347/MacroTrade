@@ -16,6 +16,11 @@ enum KoreaInvestmentEndpoint {
         startDate: String,
         finDate: String
     )
+    case fetchOverseasDailyPrice(
+        token: String,
+        EXCD: String,
+        SYMB: String,
+    )
     case fetchDomesticStockBalance(
         token: String
     )
@@ -49,6 +54,8 @@ extension KoreaInvestmentEndpoint: EndPoint {
             return "/uapi/overseas-stock/v1/trading/inquire-balance"
         case .fetchOverseasAccountBalance:
             return "/uapi/overseas-stock/v1/trading/inquire-psamount"
+        case .fetchOverseasDailyPrice:
+            return "/uapi/overseas-price/v1/quotations/dailyprice"
         }
     }
 
@@ -74,6 +81,14 @@ extension KoreaInvestmentEndpoint: EndPoint {
                 "fid_input_date_2": finDate,
                 "fid_period_div_code": period,
                 "fid_org_adj_prc":"1"
+            ]
+        case .fetchOverseasDailyPrice(_, let excd, let symb):
+            return [
+                "EXCD": excd,
+                "SYMB": symb,
+                "GUBN": 0,
+                "BYMD": "",
+                "MODP": "0"
             ]
         case .fetchDomesticStockBalance(_):
             return [
@@ -122,6 +137,15 @@ extension KoreaInvestmentEndpoint: EndPoint {
                 "appkey": APIConfigManager.shared.appKey,
                 "appsecret": APIConfigManager.shared.appSecret,
                 "tr_id": "FHKST03010100"
+            ]
+        case .fetchOverseasDailyPrice(let token, _,_):
+            return [
+                "content-type": "application/json",
+                "Connection" : "keep-alive",
+                "Authorization": "Bearer \(token)",
+                "appkey": APIConfigManager.shared.appKey,
+                "appsecret": APIConfigManager.shared.appSecret,
+                "tr_id": "HHDFS76240000"
             ]
         case .fetchDomesticStockBalance(let token):
             let trId = APIConfigManager.shared.isDemo ? "VTTC8434R" : "TTTC8434R"

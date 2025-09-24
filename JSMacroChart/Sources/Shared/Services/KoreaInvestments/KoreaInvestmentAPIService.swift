@@ -5,6 +5,28 @@ class KoreaInvestmentAPIService {
     static let shared = KoreaInvestmentAPIService()
     private let tokenManager: TokenManager
     private let networkService: NetworkService
+    enum ExchangeCode : String, Codable {
+        /// 홍콩
+        case HKS
+        /// 뉴욕
+        case NYS
+        /// 나스닥
+        case NAS
+        /// 아멕스
+        case AMS
+        /// 도쿄
+        case TSE
+        /// 상해
+        case SHS
+        /// 상해지수/
+        case SHI
+        /// 심천
+        case SZS
+        /// 호치민
+        case HSX
+        /// 하노이
+        case HNX
+    }
 
     private init(
         networkService: NetworkService = APINetworkService.shared,
@@ -20,8 +42,8 @@ class KoreaInvestmentAPIService {
         await tokenManager.resetToken()
     }
 
-    /// 일별 주가 데이터를 가져옵니다.
-    func fetchDailyPrice(stockCode: String, period: String = "D") async throws -> [DailyPriceInfo] {
+    /// 국내주식 일별 주가 데이터를 가져옵니다.
+    func fetchDomesticDailyPrice(stockCode: String, period: String = "D") async throws -> [DailyPriceInfo] {
         let token = try await tokenManager.getValidToken()
         let (start,fin) = getStartFinDates()
         let endpoint = KoreaInvestmentEndpoint.fetchDailyPrice(
@@ -38,6 +60,17 @@ class KoreaInvestmentAPIService {
         }
         
         return response.dailyPrices
+    }
+    /// 해외주식 일별 주가 데이터를 가져옵니다.
+    func fetchOverseasDailyPrice(stockCode: String, excd: ExchangeCode = .NAS ) async throws -> [OverseasDailyStockPrice] {
+        let token = try await tokenManager.getValidToken()
+        let endpoint = KoreaInvestmentEndpoint.fetchOverseasDailyPrice(token: token, EXCD: excd.rawValue, SYMB: stockCode)
+        let response: OverseasStockPriceInfo = try await networkService.request(endpoint: endpoint)
+        
+        guard response.returnCode == "0" else {
+            throw NSError(domain: "KoreaInvestmentAPI", code: Int(response.returnCode) ?? -1, userInfo: [NSLocalizedDescriptionKey: response.message])
+        }
+        return response.priceHistories
     }
     
     /// 국내주식 잔고를 조회합니다.

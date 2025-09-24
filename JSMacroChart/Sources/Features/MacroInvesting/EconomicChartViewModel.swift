@@ -65,7 +65,7 @@ class EconomicChartViewModel: ObservableObject {
     }
 
     private func fetchAndProcessData(symbol: String) async throws -> [ChartDataPoint] {
-        let dailyPrices = try await apiService.fetchDailyPrice(stockCode: symbol)
+        let dailyPrices = try await apiService.fetchDomesticDailyPrice(stockCode: symbol)
         
         let chartData = dailyPrices.compactMap { data -> ChartDataPoint? in
             guard let date = dateFormatter.date(from: data.businessDate),

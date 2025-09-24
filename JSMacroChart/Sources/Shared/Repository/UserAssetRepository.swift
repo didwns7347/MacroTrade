@@ -125,4 +125,14 @@ struct KoreaInvestmentUserAssetRepository: UserAssetRepository {
             return []
         }
     }
+    
+    func getStockMovement(stock: StockAsset) async throws-> StockDayMovement {
+        if stock.assetType == .domestic {
+            let result = try await apiService.fetchDomesticDailyPrice(stockCode: stock.code ?? "")
+           return StockDayMovement(code: stock.code ?? "", name: stock.name, type: .domestic, closingPrices: result.map{$0.closingPrice})
+        } else {
+            let result = try await apiService.fetchOverseasDailyPrice(stockCode: stock.ticker ?? "", excd: .NAS)
+            return StockDayMovement(code: stock.ticker ?? "" , name: stock.name, type: .overseas, closingPrices: result.map{$0.closingPrice})
+        }
+    }
 }
