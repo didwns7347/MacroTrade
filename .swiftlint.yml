@@ -1,0 +1,49 @@
+# SwiftLint 기본 설정 파일
+
+# 비활성화할 규칙
+disabled_rules:
+  - trailing_whitespace # Xcode가 자동으로 처리하는 경우가 많음
+  - line_length # 라인 길이는 아래에서 별도 설정
+
+# 포함할 경로
+included:
+  - JSMacroChart/Sources
+  - JSMacroChart/Tests
+
+# 제외할 경로
+excluded:
+  - Pods
+  - Derived
+  - .build
+  - Tuist
+
+# 규칙별 상세 설정
+line_length:
+  warning: 140
+  error: 160
+
+function_body_length:
+  warning: 50
+  error: 80
+
+file_length:
+  warning: 500
+  error: 1000
+
+type_body_length:
+  warning: 400
+  error: 700
+
+identifier_name:
+  min_length: 2
+  excluded:
+    - i
+    - id
+    - x
+    - y
+    - z
+
+# 강제 캐스팅/try/언래핑에 대한 경고 또는 오류 설정
+force_cast: warning
+force_try: warning
+force_unwrapping: error

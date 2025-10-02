@@ -32,6 +32,4 @@ struct StockAsset: Identifiable {
     let totalBuyingPrice: Decimal // 해외주식 매입 금액
     let quantity: Float // 수량
     let excgCd: String? // 거래소 코드
-    
-  
 }

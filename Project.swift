@@ -25,6 +25,24 @@ let project = Project(
             ),
             sources: ["JSMacroChart/Sources/**"],
             resources: ["JSMacroChart/Resources/**"],
+            scripts: [
+                .pre(
+                    script: """
+                    # Apple Silicon Homebrew 경로 추가
+                    if test -d "/opt/homebrew/bin/"; then
+                        PATH="/opt/homebrew/bin/:${PATH}"
+                    fi
+
+                    # SwiftLint 설치 여부 확인 및 실행
+                    if which swiftlint > /dev/null; then
+                        swiftlint
+                    else
+                        echo "warning: SwiftLint not installed, skipping."
+                    fi
+                    """,
+                    name: "SwiftLint"
+                ),
+            ],
             dependencies: [],
             // XCConfig 파일을 사용하도록 설정 추가
             settings: .settings(
