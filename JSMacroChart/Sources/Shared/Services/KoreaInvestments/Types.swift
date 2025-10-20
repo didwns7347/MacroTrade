@@ -358,3 +358,8 @@ struct OverseasDailyStockPrice: Codable {
         case volumeAsk = "vask"
     }
 }
+
+struct StockDailyHistory : Encodable {
+    let code: String
+    let closingPrices: [String]
+}
