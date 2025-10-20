@@ -85,7 +85,7 @@ struct CurrentPriceInfo: Decodable {
 }
 
 // MARK: - Daily Price Info
-struct DailyPriceInfo: Decodable {
+struct DailyPriceInfo: Codable {
     let businessDate: String
     let closingPrice: String
     let openingPrice: String

@@ -29,7 +29,7 @@ struct APIConfigManager {
         }
         self.appKey = appKey
         self.appSecret = appSecret
-        self.baseURL = baseURL
+        self.baseURL = "https://\(baseURL)"
         self.cano = cano
         self.accountCode = accountCode
     }
