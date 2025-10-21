@@ -33,6 +33,14 @@ enum KoreaInvestmentEndpoint {
         token: String,
         OVRS_EXCG_CD: String
     )
+    case fetchDomesticStockPerformance(
+        token: String,
+        stockCode: String
+    )
+    case fetchDomesticStockInfo(
+        token: String,
+        stockCode: String
+    )
 }
 
 
@@ -56,6 +64,10 @@ extension KoreaInvestmentEndpoint: EndPoint {
             return "/uapi/overseas-stock/v1/trading/inquire-psamount"
         case .fetchOverseasDailyPrice:
             return "/uapi/overseas-price/v1/quotations/dailyprice"
+        case .fetchDomesticStockPerformance:
+            return "/uapi/domestic-stock/v1/finance/income-statement"
+        case .fetchDomesticStockInfo:
+            return "/uapi/domestic-stock/v1/quotations/inquire-price"
         }
     }
 
@@ -122,6 +134,17 @@ extension KoreaInvestmentEndpoint: EndPoint {
                 "OVRS_ORD_UNPR" : 1.4,
                 "ITEM_CD":"TRVG"
             ]
+        case .fetchDomesticStockPerformance(token: _, stockCode: let code):
+            return [
+                "fid_cond_mrkt_div_code":"J",
+                "fid_input_iscd": "\(code)",
+                "fid_div_cls_code": "1" // 0 연간 or 1 분기
+            ]
+        case .fetchDomesticStockInfo(token: _, stockCode: let code):
+            return [
+                "fid_cond_mrkt_div_code":"J",
+                "fid_input_iscd": "\(code)"
+            ]
         }
     }
 
@@ -129,6 +152,15 @@ extension KoreaInvestmentEndpoint: EndPoint {
         switch self {
         case .issueToken:
             return ["content-type": "application/json"]
+        case .fetchDomesticStockInfo(token: let token, stockCode: _):
+            return [
+                "content-type": "application/json",
+                "Connection" : "keep-alive",
+                "Authorization": "Bearer \(token)",
+                "appkey": APIConfigManager.shared.appKey,
+                "appsecret": APIConfigManager.shared.appSecret,
+                "tr_id": "FHKST01010100"
+            ]
         case .fetchDailyPrice(let token, _, _, _, _):
             return [
                 "content-type": "application/json",
@@ -176,6 +208,16 @@ extension KoreaInvestmentEndpoint: EndPoint {
                 "appkey": APIConfigManager.shared.appKey,
                 "appsecret": APIConfigManager.shared.appSecret,
                 "tr_id": APIConfigManager.shared.isDemo ? "TTTS3007R" : "TTTS3007R"
+            ]
+            
+        case .fetchDomesticStockPerformance(token: let token, stockCode: _):
+            return [
+                "content-type": "application/json",
+                "Authorization": "Bearer \(token)",
+                "appkey": APIConfigManager.shared.appKey,
+                "appsecret": APIConfigManager.shared.appSecret,
+                "tr_id": APIConfigManager.shared.isDemo ? "FHKST66430200" : "FHKST66430200",
+                "custtype":"P"
             ]
         }
     }

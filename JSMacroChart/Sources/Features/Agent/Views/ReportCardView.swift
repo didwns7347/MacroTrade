@@ -30,7 +30,7 @@ struct ReportCardView: View {
                 
             case .success(let content):
                 // Markdown 컨텐츠를 렌더링 (iOS 15+)
-                Text(content)
+                MarkdownViewer(markdown: content)
                 
             case .failure(let error):
                 VStack(alignment: .leading) {
@@ -51,5 +51,5 @@ struct ReportCardView: View {
     }
 }
 #Preview {
-    ReportCardView(report: .init(stockName: "AAPL", stockCode: "AAPL", isOverseas: false, status: .success(content: "test test")))
+    ReportCardView(report: .init(stockName: "AAPL", stockCode: "AAPL", isOverseas: false, status: .success(content: "### test test")))
 }

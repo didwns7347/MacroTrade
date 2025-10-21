@@ -14,14 +14,14 @@ class StockPriceHistoryTool : Tool {
             result = StockDailyHistory( 
                 code: ticker,
                 closingPrices: try await KoreaInvestmentAPIService.shared.fetchOverseasDailyPrice(stockCode: ticker).map {
-                    $0.closingPrice
+                    return ["closingPrice":"\($0.closingPrice)", "date":"\($0.date)"]
                 }
             )
         } else {
             result = StockDailyHistory(
                 code: ticker,
                 closingPrices: try await KoreaInvestmentAPIService.shared.fetchDomesticDailyPrice(stockCode: ticker).map {
-                    $0.closingPrice
+                    return ["closingPrice":"\($0.closingPrice)", "date":"\($0.businessDate)"]
                 }
             )
         }
@@ -31,5 +31,41 @@ class StockPriceHistoryTool : Tool {
             throw ToolError.encodingError
         }
         
+    }
+}
+
+class StockPerformanceTool : Tool {
+    func execute(args: String) async throws -> String {
+        let infos = args.split(separator: "|")
+        let ticker = String(infos[1])
+        
+        let stockDetail = try await KoreaInvestmentAPIService.shared.fetchDomesticStockDetail(code: ticker)
+        var result: StockPerformance
+        if infos[0] == "TRUE" {
+            result = StockPerformance(
+                name: String(infos[2]),
+                code: ticker,
+                marketCapitalization: stockDetail.marketCapitalization,
+                per: stockDetail.per,
+                pbr: stockDetail.pbr,
+                eps: stockDetail.eps,
+                financialStates: try await KoreaInvestmentAPIService.shared.fetchDomesticStockPerformance(code: ticker).output
+            )
+        } else {
+            result = StockPerformance(
+                name: String(infos[2]),
+                code: ticker,
+                marketCapitalization: stockDetail.marketCapitalization,
+                per: stockDetail.per,
+                pbr: stockDetail.pbr,
+                eps: stockDetail.eps,
+                financialStates: try await KoreaInvestmentAPIService.shared.fetchDomesticStockPerformance(code: ticker).output
+            )
+        }
+        if let resultString = result.toJSONString(prettyPrinted: true) {
+            return resultString
+        } else {
+            throw ToolError.encodingError
+        }
     }
 }

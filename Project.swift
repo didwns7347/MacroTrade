@@ -21,6 +21,7 @@ let project = Project(
                     "CANO": "$(CANO)",
                     "ACNT_PRDT_CD": "$(ACNT_PRDT_CD)",
                     "URL_BASE": "$(URL_BASE)",
+                    "OPEN_API_KEY":"$(OPEN_API_KEY)"
                 ]
             ),
             sources: ["JSMacroChart/Sources/**"],
@@ -43,7 +44,9 @@ let project = Project(
                     name: "SwiftLint"
                 ),
             ],
-            dependencies: [],
+            dependencies: [
+                .external(name: "MarkdownUI", condition: nil)
+            ],
             // XCConfig 파일을 사용하도록 설정 추가
             settings: .settings(
                 base: [:],

@@ -93,6 +93,21 @@ class KoreaInvestmentAPIService {
         
         return response
     }
+    /// 국내주식 영업 실적 조회
+    func fetchDomesticStockPerformance(code: String) async throws -> DomesticStockPerformanceResponse {
+        let token = try await tokenManager.getValidToken()
+        let endpoint = KoreaInvestmentEndpoint.fetchDomesticStockPerformance(token: token, stockCode: code)
+        let response: DomesticStockPerformanceResponse = try await networkService.request(endpoint: endpoint)
+        return response
+    }
+    
+    /// 국내주식 기본 조회
+    func fetchDomesticStockDetail(code: String) async throws -> DomesticStockDetail {
+        let token = try await tokenManager.getValidToken()
+        let endpoint = KoreaInvestmentEndpoint.fetchDomesticStockInfo(token: token, stockCode: code)
+        let response: DomesticStockDetailResponse = try await networkService.request(endpoint: endpoint)
+        return response.output
+    }
     
     /// 해외주식 잔고를 조회합니다.
     func fetchOverseasStockBalance(
@@ -135,11 +150,13 @@ class KoreaInvestmentAPIService {
         }
         return response.balance
     }
-
     
+    
+
+    // 3달치
     private func getStartFinDates() -> (String, String) {
         return (
-            Calendar.current.date(byAdding: .month, value: -2, to: Date())?.toStringYYYYMMDD() ?? "",
+            Calendar.current.date(byAdding: .month, value: -3, to: Date())?.toStringYYYYMMDD() ?? "",
             Date().toStringYYYYMMDD()
         )
     }
