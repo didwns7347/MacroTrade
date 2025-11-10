@@ -6,8 +6,9 @@ struct JSMacroChartApp: App {
 
     var body: some Scene {
         WindowGroup {
-            DashboardView()
-                .environmentObject(assetService)
+//            DashboardView()
+//                .environmentObject(assetService)
+            AuthContainerView()
         }
     }
 }

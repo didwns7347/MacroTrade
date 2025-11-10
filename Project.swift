@@ -21,7 +21,9 @@ let project = Project(
                     "CANO": "$(CANO)",
                     "ACNT_PRDT_CD": "$(ACNT_PRDT_CD)",
                     "URL_BASE": "$(URL_BASE)",
-                    "OPEN_API_KEY":"$(OPEN_API_KEY)"
+                    "OPEN_API_KEY":"$(OPEN_API_KEY)",
+                    "TD_API_ID":"$(TD_API_ID)",
+                    "TD_API_HASH":"$(TD_API_HASH)"
                 ]
             ),
             sources: ["JSMacroChart/Sources/**"],
@@ -45,7 +47,8 @@ let project = Project(
                 ),
             ],
             dependencies: [
-                .external(name: "MarkdownUI", condition: nil)
+                .external(name: "MarkdownUI", condition: nil),
+                .external(name: "TDLibKit", condition: nil),
             ],
             // XCConfig 파일을 사용하도록 설정 추가
             settings: .settings(
